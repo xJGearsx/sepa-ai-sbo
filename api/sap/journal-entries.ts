@@ -1,5 +1,17 @@
 import { z } from 'zod'
 
+type Req = {
+  method?: string
+  body?: unknown
+}
+
+type Res = {
+  status: (code: number) => Res
+  json: (body: unknown) => void
+  type: (mime: string) => Res
+  send: (body: unknown) => void
+}
+
 const sapConfigSchema = z.object({
   baseUrl: z.string().min(1),
   companyDb: z.string().min(1),
@@ -66,7 +78,7 @@ async function sapLogin(sap: z.infer<typeof sapConfigSchema>): Promise<string> {
   return cookie
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: Req, res: Res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' })
     return
@@ -119,4 +131,3 @@ export default async function handler(req: any, res: any) {
     res.status(502).json({ error: e instanceof Error ? e.message : 'SAP error' })
   }
 }
-

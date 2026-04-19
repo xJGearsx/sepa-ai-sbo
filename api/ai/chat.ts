@@ -1,5 +1,15 @@
 import { z } from 'zod'
 
+type Req = {
+  method?: string
+  body?: unknown
+}
+
+type Res = {
+  status: (code: number) => Res
+  json: (body: unknown) => void
+}
+
 const chatSchema = z.object({
   messages: z.array(
     z.object({
@@ -9,7 +19,7 @@ const chatSchema = z.object({
   ),
 })
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: Req, res: Res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' })
     return
@@ -57,4 +67,3 @@ export default async function handler(req: any, res: any) {
 
   res.status(200).json({ content })
 }
-
